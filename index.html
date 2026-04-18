@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turing Machine Arithmetic Simulator</title>
+  <meta name="description" content="A visual Turing Machine simulator that performs addition, subtraction, multiplication, and division using unary arithmetic." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated background particles -->
+  <div class="bg-particles" id="bg-particles"></div>
+
+  <header class="header" id="header">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none">
+            <rect x="2" y="8" width="10" height="24" rx="2" fill="url(#g1)" opacity="0.9"/>
+            <rect x="15" y="4" width="10" height="32" rx="2" fill="url(#g1)"/>
+            <rect x="28" y="12" width="10" height="16" rx="2" fill="url(#g1)" opacity="0.7"/>
+            <rect x="6" y="18" width="2" height="4" rx="1" fill="#0f172a"/>
+            <rect x="19" y="18" width="2" height="4" rx="1" fill="#0f172a"/>
+            <rect x="32" y="18" width="2" height="4" rx="1" fill="#0f172a"/>
+            <defs><linearGradient id="g1" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs>
+          </svg>
+        </div>
+        <div>
+          <h1>Turing Machine Simulator</h1>
+          <p class="subtitle">Visual Arithmetic Engine &mdash; Addition &middot; Subtraction &middot; Multiplication &middot; Division</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-grid">
+    <!-- Left Column: Controls -->
+    <section class="panel input-panel" id="input-panel">
+      <div class="panel-header">
+        <span class="panel-dot green"></span>
+        <span class="panel-title">Expression Input</span>
+      </div>
+      <div class="panel-body">
+        <div class="input-group">
+          <label for="operand1">Operand A</label>
+          <input type="number" id="operand1" min="0" max="20" value="5" class="num-input" />
+        </div>
+        <div class="input-group">
+          <label>Operation</label>
+          <div class="op-buttons" id="op-buttons">
+            <button class="op-btn active" data-op="+" id="op-add">+</button>
+            <button class="op-btn" data-op="-" id="op-sub">&minus;</button>
+            <button class="op-btn" data-op="*" id="op-mul">&times;</button>
+            <button class="op-btn" data-op="/" id="op-div">&divide;</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="operand2">Operand B</label>
+          <input type="number" id="operand2" min="0" max="20" value="3" class="num-input" />
+        </div>
+        <div class="expression-preview" id="expression-preview">
+          <span class="expr-label">Expression</span>
+          <span class="expr-value" id="expr-value">5 + 3 = ?</span>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" id="btn-load">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 7.293V1.5A.5.5 0 0 1 8 1zM2 10a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 13 14H3a1.5 1.5 0 0 1-1.5-1.5v-2A.5.5 0 0 1 2 10z"/></svg>
+            Load &amp; Initialize
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Simulation Controls -->
+    <section class="panel controls-panel" id="controls-panel">
+      <div class="panel-header">
+        <span class="panel-dot blue"></span>
+        <span class="panel-title">Simulation Controls</span>
+      </div>
+      <div class="panel-body">
+        <div class="sim-buttons">
+          <button class="btn btn-sim" id="btn-step" disabled>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 4a.5.5 0 0 1 .832-.374l4.5 4a.5.5 0 0 1 0 .748l-4.5 4A.5.5 0 0 1 4 12V4zm7 0a.5.5 0 0 1 1 0v8a.5.5 0 0 1-1 0V4z"/></svg>
+            Step
+          </button>
+          <button class="btn btn-sim" id="btn-run" disabled>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+            Run
+          </button>
+          <button class="btn btn-sim" id="btn-pause" disabled>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
+            Pause
+          </button>
+          <button class="btn btn-sim btn-danger" id="btn-reset" disabled>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/><path d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/></svg>
+            Reset
+          </button>
+        </div>
+        <div class="speed-control">
+          <label for="speed-slider">Speed</label>
+          <div class="speed-row">
+            <span class="speed-label">Slow</span>
+            <input type="range" id="speed-slider" min="20" max="500" value="120" class="slider" />
+            <span class="speed-label">Fast</span>
+          </div>
+        </div>
+        <div class="status-card" id="status-card">
+          <div class="status-row">
+            <span class="status-key">Status</span>
+            <span class="status-val" id="status-text">Idle</span>
+          </div>
+          <div class="status-row">
+            <span class="status-key">State</span>
+            <span class="status-val mono" id="state-text">—</span>
+          </div>
+          <div class="status-row">
+            <span class="status-key">Step</span>
+            <span class="status-val mono" id="step-text">0</span>
+          </div>
+          <div class="status-row">
+            <span class="status-key">Head Pos</span>
+            <span class="status-val mono" id="head-text">0</span>
+          </div>
+          <div class="status-row">
+            <span class="status-key">Read</span>
+            <span class="status-val mono" id="read-text">—</span>
+          </div>
+          <div class="status-row">
+            <span class="status-key">Write</span>
+            <span class="status-val mono" id="write-text">—</span>
+          </div>
+          <div class="status-row">
+            <span class="status-key">Direction</span>
+            <span class="status-val mono" id="dir-text">—</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Full-width: Tape Visualization -->
+    <section class="panel tape-panel" id="tape-panel">
+      <div class="panel-header">
+        <span class="panel-dot purple"></span>
+        <span class="panel-title">Infinite Tape</span>
+        <span class="tape-hint" id="tape-hint">Load an expression to begin</span>
+      </div>
+      <div class="tape-container" id="tape-container">
+        <div class="tape-head-indicator" id="tape-head-indicator">
+          <svg width="24" height="18" viewBox="0 0 24 18" fill="none">
+            <path d="M12 18L2 4H22L12 18Z" fill="url(#headGrad)"/>
+            <defs><linearGradient id="headGrad" x1="12" y1="0" x2="12" y2="18"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs>
+          </svg>
+        </div>
+        <div class="tape-scroll" id="tape-scroll">
+          <div class="tape-cells" id="tape-cells">
+            <!-- Cells generated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Full-width: Result -->
+    <section class="panel result-panel" id="result-panel">
+      <div class="panel-header">
+        <span class="panel-dot amber"></span>
+        <span class="panel-title">Result</span>
+      </div>
+      <div class="result-body">
+        <div class="result-big" id="result-value">—</div>
+        <div class="result-detail" id="result-detail"></div>
+      </div>
+    </section>
+
+    <!-- Full-width: Transition Table -->
+    <section class="panel table-panel" id="table-panel">
+      <div class="panel-header">
+        <span class="panel-dot cyan"></span>
+        <span class="panel-title">Transition Table</span>
+        <span class="table-badge" id="table-badge">—</span>
+      </div>
+      <div class="table-scroll" id="table-scroll">
+        <table class="transition-table" id="transition-table">
+          <thead><tr><th>State</th><th>Read</th><th>Write</th><th>Next State</th><th>Move</th></tr></thead>
+          <tbody id="transition-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Full-width: FSM State Diagram -->
+    <section class="panel graph-panel" id="fsm-panel">
+      <div class="panel-header">
+        <span class="panel-dot pink"></span>
+        <span class="panel-title">Finite State Machine Diagram</span>
+        <span class="graph-badge" id="fsm-badge">—</span>
+      </div>
+      <div class="graph-container" id="fsm-container">
+        <div class="graph-placeholder" id="fsm-placeholder">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="9" opacity="0.3"/>
+            <circle cx="6" cy="8" r="2.5" opacity="0.5"/>
+            <circle cx="18" cy="8" r="2.5" opacity="0.5"/>
+            <circle cx="12" cy="18" r="2.5" opacity="0.5"/>
+            <path d="M8.3 7.2L15.7 7.2M16.2 10L13.5 16M10.5 16L7.8 10" opacity="0.3" stroke-width="1"/>
+          </svg>
+          <span>Load an expression to view the FSM diagram</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Full-width: Turing Computation Graph -->
+    <section class="panel graph-panel" id="turing-graph-panel">
+      <div class="panel-header">
+        <span class="panel-dot teal"></span>
+        <span class="panel-title">Turing Computation Graph</span>
+        <span class="graph-badge" id="turing-graph-badge">—</span>
+      </div>
+      <div class="turing-graph-body">
+        <div class="turing-graph-stats" id="turing-graph-stats">
+          <div class="tg-stat">
+            <span class="tg-stat-label">States Visited</span>
+            <span class="tg-stat-value" id="tg-states-visited">0</span>
+          </div>
+          <div class="tg-stat">
+            <span class="tg-stat-label">Transitions Fired</span>
+            <span class="tg-stat-value" id="tg-transitions-fired">0</span>
+          </div>
+          <div class="tg-stat">
+            <span class="tg-stat-label">Unique States</span>
+            <span class="tg-stat-value" id="tg-unique-states">0</span>
+          </div>
+          <div class="tg-stat">
+            <span class="tg-stat-label">Head Travel</span>
+            <span class="tg-stat-value" id="tg-head-travel">0</span>
+          </div>
+        </div>
+        <div class="turing-graph-canvas-wrap">
+          <canvas id="turing-graph-canvas" width="800" height="200"></canvas>
+        </div>
+        <div class="turing-graph-legend">
+          <span class="tg-legend-item"><span class="tg-legend-dot" style="background: #38bdf8;"></span> State</span>
+          <span class="tg-legend-item"><span class="tg-legend-dot" style="background: #a78bfa;"></span> Head Pos</span>
+          <span class="tg-legend-item"><span class="tg-legend-dot" style="background: #4ade80;"></span> Write Op</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Turing Machine Arithmetic Simulator &mdash; Unary representation &middot; Built for learning computation theory</p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
